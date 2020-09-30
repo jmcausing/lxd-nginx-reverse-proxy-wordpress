@@ -1,12 +1,11 @@
-clear 
 echo "#### LXC + LEMP + WordPress by generator by John Mark C." 
 echo "#"
 
 # Cloudflare add DNS for this LXC Cloudflare zone is the zone which holds the record
 zone=causingdesigns.net
 ## Cloudflare authentication details keep these private
-cloudflare_auth_email=#####
-cloudflare_auth_key=#####
+cloudflare_auth_email=####
+cloudflare_auth_key=####
 
 
    #################### 
@@ -291,7 +290,7 @@ cloudflare_auth_key=#####
       then
          echo "# You are a member of LXD group!"
          echo "# Downloading and applying LXD config.."
-         wget -q https://raw.githubusercontent.com/jmcausing/lxc-lemp-wp/master/lxdconfig.yaml
+         wget -q https://raw.githubusercontent.com/jmcausing/lxd-nginx-reverse-proxy-wordpress/master/lxdconfig.yaml
          sudo lxd init --preseed < lxdconfig.yaml
          rm lxdconfig.yaml   
       else
@@ -584,14 +583,14 @@ cloudflare_auth_key=#####
       echo "#"
       echo "# $FILE exists. Deleting and downloading a fresh one!"
       rm default
-      wget -q w https://raw.githubusercontent.com/jmcausing/lxc-lemp-wp/master/default
+      wget -q w https://raw.githubusercontent.com/jmcausing/lxd-nginx-reverse-proxy-wordpress/master/default
       echo "#"
       
    else 
       echo "#"
       echo "# $FILE does not exist."
       echo "# Downloading a fresh nginx default config file"
-      wget -q https://raw.githubusercontent.com/jmcausing/lxc-lemp-wp/master/default
+      wget -q https://raw.githubusercontent.com/jmcausing/lxd-nginx-reverse-proxy-wordpress/master/default
       echo "#"
    fi
 
@@ -601,14 +600,14 @@ cloudflare_auth_key=#####
       echo "#"
       echo "# $FILE exists. Deleting and downloading a fresh one!"
       rm vars.yml
-      wget -q https://raw.githubusercontent.com/jmcausing/lxc-lemp-wp/master/vars.yml
+      wget -q https://raw.githubusercontent.com/jmcausing/lxd-nginx-reverse-proxy-wordpress/master/vars.yml
       echo "#"
       
    else 
       echo "#"
       echo "# $FILE does not exist."
       echo "# Downloading vars.yml for Ansible"
-      wget -q https://raw.githubusercontent.com/jmcausing/lxc-lemp-wp/master/vars.yml
+      wget -q https://raw.githubusercontent.com/jmcausing/lxd-nginx-reverse-proxy-wordpress/master/vars.yml
       echo "#"
    fi
 
@@ -618,14 +617,14 @@ cloudflare_auth_key=#####
       echo "#"
       echo "# $FILE exists. Deleting and downloading a fresh one!"
       rm ansible_wpconfig.php
-      wget -q https://raw.githubusercontent.com/jmcausing/lxc-lemp-wp/master/ansible_wpconfig.php
+      wget -q https://raw.githubusercontent.com/jmcausing/lxd-nginx-reverse-proxy-wordpress/master/ansible_wpconfig.php
       echo "#"
       
    else 
       echo "#"
       echo "$FILE does not exist."
       echo "# Downloading a fresh nginx default config file"
-      wget -q https://raw.githubusercontent.com/jmcausing/lxc-lemp-wp/master/ansible_wpconfig.php
+      wget -q https://raw.githubusercontent.com/jmcausing/lxd-nginx-reverse-proxy-wordpress/master/ansible_wpconfig.php
       echo "#"
    fi
 
@@ -635,7 +634,7 @@ cloudflare_auth_key=#####
       echo "#"
       echo "# $FILE exists. Deleting and downloading a fresh one!"
       rm play.yml
-      wget -q https://raw.githubusercontent.com/jmcausing/lxc-lemp-wp/master/play.yml
+      wget -q https://raw.githubusercontent.com/jmcausing/lxd-nginx-reverse-proxy-wordpress/master/play.yml
       mv play.yml ${lxcname}_lemp.yml
       echo "#"
       
@@ -643,7 +642,7 @@ cloudflare_auth_key=#####
       echo "#"
       echo "# $FILE does not exist."
       echo "# Downloading a fresh nginx default config file"
-      wget -q https://raw.githubusercontent.com/jmcausing/lxc-lemp-wp/master/play.yml
+      wget -q https://raw.githubusercontent.com/jmcausing/lxd-nginx-reverse-proxy-wordpress/master/play.yml
       mv play.yml ${lxcname}_lemp.yml
       echo "#"
    fi
@@ -698,7 +697,7 @@ cloudflare_auth_key=#####
    # Downloading default nginx1.example.com file
    echo "# "
    echo "# Download and transfer default nginx site config file"    
-   wget -q https://raw.githubusercontent.com/jmcausing/lxc-lemp-wp/master/nginx1.example.com   
+   wget -q https://raw.githubusercontent.com/jmcausing/lxd-nginx-reverse-proxy-wordpress/master/nginx1.example.com   
 
    mv nginx1.example.com  ${cfdomain}.causingdesigns.net
 
@@ -740,6 +739,7 @@ cloudflare_auth_key=#####
 
 
    # Install the WordPress database.
+  
    lxc exec ${lxcname} -- sudo --login --user ubuntu sh -c "wp core install --url=http://$cfdomain.causingdesigns.net --title=${lxcname} --admin_user=test --admin_password=test --admin_email=YOU@YOURDOMAIN.com   --path=/var/www/html" --verbose
 
 
@@ -747,6 +747,7 @@ cloudflare_auth_key=#####
    echo "#"
    echo "# WP-CLI run search and relace to fix mixed-content issue"
    lxc exec ${lxcname} -- sudo --login --user ubuntu sh -c "wp search-replace http://$cfdomain.causingdesigns.net https://$cfdomain.causingdesigns.net --path=/var/www/html" --verbose
+
 
 
 
