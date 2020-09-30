@@ -124,7 +124,7 @@
       template:
         src: "ansible_wpconfig.php"
         dest: "/var/www/html/wp-config.php"
-        owner: ubuntu
+        owner: www-data
         group: www-data
 
 
