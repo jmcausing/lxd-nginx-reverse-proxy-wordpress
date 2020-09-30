@@ -749,6 +749,18 @@ cloudflare_auth_key=####
    lxc exec ${lxcname} -- sudo --login --user ubuntu sh -c "wp search-replace http://$cfdomain.causingdesigns.net https://$cfdomain.causingdesigns.net --path=/var/www/html" --verbose
 
 
+   # Seutp phpmyadin
+   echo "#"
+   echo "# Let's setup phpmyadmin"
+   lxc exec  ${lxcname} -- sh -c "export DEBIAN_FRONTEND=noninteractive;apt-get -yq install phpmyadmin" --verbose
+
+   lxc exec ${lxcname} -- sh -c "dpkg-reconfigure --frontend=noninteractive phpmyadmin" --verbose 
+
+   lxc exec ${lxcname} -- sh -c "ln -s /usr/share/phpmyadmin /var/www/html" --verbose 
+
+   lxc exec ${lxcname} -- sh -c "systemctl restart php7.3-fpm" --verbose 
+
+   
 
 
 
@@ -756,6 +768,7 @@ cloudflare_auth_key=####
    echo "#"
    echo "#"
    echo "# Visit your WordPress site using this link: http://$cfdomain.causingdesigns.net"
+   echo "# Phpmyadmin - http://$cfdomain.causingdesigns.net/phpmyadmin - user: wp_user - pass: password"
    echo "# Thank you for using LXC LEMP + WordPress setup!"
 
 
