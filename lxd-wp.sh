@@ -219,6 +219,17 @@ cloudflare_auth_key=####
 
    echo "# Hello! Enter the LXC container name please:"
    read -p "# Enter LXC name: " lxcname
+
+   # Read WordPress Password
+   echo -n "# Enter your WordPress Password": 
+   read -s wppassword
+
+   echo "# Hello! Enter the LXC container name please:"
+   read -p "# Enter your WordPress email: " wpemail
+   echo "#"
+   echo "#"
+
+
    echo "# Alright! Let's generate the LXC container Ubuntu 18.04: $lxcname"
    echo "#"
    echo "#"
@@ -740,7 +751,7 @@ cloudflare_auth_key=####
 
    # Install the WordPress database.
   
-   lxc exec ${lxcname} -- sudo --login --user ubuntu sh -c "wp core install --url=http://$cfdomain.causingdesigns.net --title=${lxcname} --admin_user=test --admin_password=test --admin_email=YOU@YOURDOMAIN.com   --path=/var/www/html" --verbose
+   lxc exec ${lxcname} -- sudo --login --user ubuntu sh -c "wp core install --url=http://$cfdomain.causingdesigns.net --title=${lxcname} --admin_user=${lxcname}  --admin_password=${wppassword}  --admin_email=${wpemail}   --path=/var/www/html" --verbose
 
 
    # Search and replace
@@ -751,17 +762,11 @@ cloudflare_auth_key=####
 
    # Seutp phpmyadin
    echo "#"
-   echo "# Let's setup phpmyadmin"
+   echo "# Let's setup phpmyadmin..."
    lxc exec  ${lxcname} -- sh -c "export DEBIAN_FRONTEND=noninteractive;apt-get -yq install phpmyadmin" --verbose
-
    lxc exec ${lxcname} -- sh -c "dpkg-reconfigure --frontend=noninteractive phpmyadmin" --verbose 
-
    lxc exec ${lxcname} -- sh -c "ln -s /usr/share/phpmyadmin /var/www/html" --verbose 
-
    lxc exec ${lxcname} -- sh -c "systemctl restart php7.3-fpm" --verbose 
-
-   
-
 
 
    echo "#"
@@ -769,6 +774,10 @@ cloudflare_auth_key=####
    echo "#"
    echo "# Visit your WordPress site using this link: http://$cfdomain.causingdesigns.net"
    echo "# Phpmyadmin - http://$cfdomain.causingdesigns.net/phpmyadmin - user: wp_user - pass: password"
+   echo "# WordPress login url: http://$cfdomain.causingdesigns.net/wp-admin "
+   echo "# WordPerss username: ${lxcname} -- Password: the one you entered earlier" 
+   echo "#"
+   echo "#"
    echo "# Thank you for using LXC LEMP + WordPress setup!"
 
 
