@@ -163,3 +163,8 @@
 
     # WordPress Configuration and permission -
     # -- END
+    
+    
+    - name: Install phpmyadmin
+      apt:  phpmyadmin
+    
