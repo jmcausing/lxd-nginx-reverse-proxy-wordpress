@@ -164,8 +164,4 @@
     # WordPress Configuration and permission -
     # -- END
     
-    
-    - name: Install phpmyadmin
-      apt:
-        name: phpmyadmin
-        state: present
+
