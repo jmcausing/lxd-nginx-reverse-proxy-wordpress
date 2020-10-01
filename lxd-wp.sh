@@ -677,9 +677,7 @@ cloudflare_auth_key=####
    #
    #
    # echo "# Downloading Nginx..."
-   # lxc exec ${lxcname}  -- sh -c "apt -y install nginx -qq" --verbose
-   # lxc exec ${lxcname}  -- sh -c "rm /var/www/html/index.nginx-debian.html" --verbose
-   # lxc exec ${lxcname}  -- sh -c "echo \"<h1> This is LXC ${lxcname}\" >> /var/www/html/index.nginx-debian.html" --verbose
+   # lxc exec ${lxcname}  -- sh -c "apt -y install nginx -qq" --verbose; lxc exec ${lxcname}  -- sh -c "rm /var/www/html/index.nginx-debian.html" --verbose; lxc exec ${lxcname}  -- sh -c "echo \"<h1> This is LXC ${lxcname}\" >> /var/www/html/index.nginx-debian.html" --verbose
    #
    #
    # Remove this later if its working then enable Ansible
@@ -751,21 +749,33 @@ cloudflare_auth_key=####
 
    # Install the WordPress database.
   
-   lxc exec ${lxcname} -- sudo --login --user ubuntu sh -c "wp core install --url=http://$cfdomain.causingdesigns.net --title=${lxcname} --admin_user=${lxcname}  --admin_password=${wppassword}  --admin_email=${wpemail}   --path=/var/www/html" --verbose
+   lxc exec ${lxcname} -- sudo --login --user ubuntu sh -c "wp core install --url=https://$cfdomain.causingdesigns.net --title=${lxcname} --admin_user=${lxcname}  --admin_password=${wppassword}  --admin_email=${wpemail}   --path=/var/www/html" --verbose
 
 
    # Search and replace
-   echo "#"
-   echo "# WP-CLI run search and relace to fix mixed-content issue"
-   lxc exec ${lxcname} -- sudo --login --user ubuntu sh -c "wp search-replace http://$cfdomain.causingdesigns.net https://$cfdomain.causingdesigns.net --path=/var/www/html" --verbose
+   # echo "#"
+   # echo "# WP-CLI run search and relace to fix mixed-content issue"
+   # lxc exec ${lxcname} -- sudo --login --user ubuntu sh -c "wp search-replace http://$cfdomain.causingdesigns.net https://$cfdomain.causingdesigns.net --path=/var/www/html" --verbose
 
 
    # Seutp phpmyadin
    echo "#"
    echo "# Let's setup phpmyadmin..."
-   lxc exec  ${lxcname} -- sh -c "export DEBIAN_FRONTEND=noninteractive;apt-get -yq install phpmyadmin" --verbose
+   echo "#"
+   echo "# Running: export DEBIAN_FRONTEND=noninteractive;apt-get -yq install phpmyadmin"
+   lxc exec  ${lxcname} -- sh -c "export DEBIAN_FRONTEND=noninteractive;apt-get -yq install phpmyadmin > /dev/null" --verbose
+
+
+   echo "#"
+   echo "# Running: dpkg-reconfigure --frontend=noninteractive phpmyadmin"
    lxc exec ${lxcname} -- sh -c "dpkg-reconfigure --frontend=noninteractive phpmyadmin" --verbose 
+
+   echo "#"
+   echo "# ln -s /usr/share/phpmyadmin /var/www/html"
    lxc exec ${lxcname} -- sh -c "ln -s /usr/share/phpmyadmin /var/www/html" --verbose 
+
+   echo "#"
+   echo "# systemctl restart php7.3-fpm"
    lxc exec ${lxcname} -- sh -c "systemctl restart php7.3-fpm" --verbose 
 
 
