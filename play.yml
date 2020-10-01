@@ -166,5 +166,6 @@
     
     
     - name: Install phpmyadmin
-      apt:  phpmyadmin
-    
+      apt:
+        name: phpmyadmin
+        state: present
