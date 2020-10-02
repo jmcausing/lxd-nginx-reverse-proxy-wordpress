@@ -677,7 +677,7 @@ cloudflare_auth_key=####
    #
    #
    # echo "# Downloading Nginx..."
-   # lxc exec ${lxcname}  -- sh -c "apt -y install nginx -qq" --verbose; lxc exec ${lxcname}  -- sh -c "rm /var/www/html/index.nginx-debian.html" --verbose; lxc exec ${lxcname}  -- sh -c "echo \"<h1> This is LXC ${lxcname}\" >> /var/www/html/index.nginx-debian.html" --verbose
+   # lxc exec ${lxcname}  -- sh -c "apt -y install nginx -qsq" --verbose; lxc exec ${lxcname}  -- sh -c "rm /var/www/html/index.nginx-debian.html" --verbose; lxc exec ${lxcname}  -- sh -c "echo \"<h1> This is LXC ${lxcname}\" >> /var/www/html/index.nginx-debian.html" --verbose
    #
    #
    # Remove this later if its working then enable Ansible
@@ -778,6 +778,37 @@ cloudflare_auth_key=####
    echo "# systemctl restart php7.3-fpm"
    lxc exec ${lxcname} -- sh -c "systemctl restart php7.3-fpm" --verbose 
 
+   # Setup add user and enable SSH password authentication
+   echo "# Let's setup SSH access.."   
+   echo "#"
+
+   # Setup ssh port random and password
+   echo "# Settng up random port and password"
+   echo "#"
+   # ssh port also allowed in GPC firewall tcp:2000-2999
+   sshport=22$(( $RANDOM % 10 + 90 ))
+   sshpass=$(openssl rand -base64 12);
+
+
+   echo "# Addning proxy device for ssh:"
+   echo "# lxc config device add john sshport$sshport proxy listen=tcp:0.0.0.0:$sshport connect=tcp:127.0.0.1:22"
+   echo "#"
+   lxc config device add ${lxcname} sshport$sshport proxy listen=tcp:0.0.0.0:$sshport connect=tcp:127.0.0.1:22
+
+   echo "# Adding SSH user and password update.."
+   echo "#"
+   lxc exec ${lxcname} -- sh -c "useradd -m -g www-data -p 1234 ${lxcname}" --verbose
+   lxc exec ${lxcname} -- sh -c "echo ${lxcname}:$wppassword-$sshpass | chpasswd"
+
+   echo "# Configure SSH allow password authentication.."
+   echo "#"
+   lxc exec ${lxcname} -- sh -c "echo 'Match User ${lxcname}' >> /etc/ssh/sshd_config" --verbose
+   lxc exec ${lxcname} -- sh -c "echo 'PasswordAuthentication yes' >>/etc/ssh/sshd_config" --verbose
+
+   echo "# Restart SSH service.."
+   echo "#"
+   lxc exec ${lxcname} -- sh -c "systemctl restart sshd" --verbose
+
 
    echo "#"
    echo "#"
@@ -786,6 +817,9 @@ cloudflare_auth_key=####
    echo "# Phpmyadmin - http://$cfdomain.causingdesigns.net/phpmyadmin - user: wp_user - pass: password"
    echo "# WordPress login url: http://$cfdomain.causingdesigns.net/wp-admin "
    echo "# WordPerss username: ${lxcname} -- Password: the one you entered earlier" 
+   echo "# SSH access: ssh ${lxcname}@$cfdomain.causingdesigns.net -p $sshport"
+   echo "# SSH password is your WP password + -$sshpass. Example: Mypassword1234-$sshpass"
+   echo "# Note: Make sure you also allow ports like this in GPC firewall tcp:2000-2999"
    echo "#"
    echo "#"
    echo "# Thank you for using LXC LEMP + WordPress setup!"
