@@ -4,7 +4,7 @@ echo "#"
 # Cloudflare add DNS for this LXC Cloudflare zone is the zone which holds the record
 zone=causingdesigns.net
 ## Cloudflare authentication details keep these private
-cloudflare_auth_email=####
+cloudflare_auth_email=#####
 cloudflare_auth_key=####
 
 
@@ -633,7 +633,7 @@ cloudflare_auth_key=####
       
    else 
       echo "#"
-      echo "$FILE does not exist."
+      echo "# $FILE does not exist."
       echo "# Downloading a fresh nginx default config file"
       wget -q https://raw.githubusercontent.com/jmcausing/lxd-nginx-reverse-proxy-wordpress/master/ansible_wpconfig.php
       echo "#"
@@ -664,6 +664,10 @@ cloudflare_auth_key=####
    ls -al vars.yml
    echo "#"
 
+   echo "# Updating mysql credentials.."
+   sed -i "s/mysqluser/${lxcname}/g" vars.yml
+   sed -i "s/mysqlpasswd/${wppassword}/g" vars.yml
+
    echo "#"
    echo "# Running playbook with this command:"
    echo "#"
@@ -677,7 +681,7 @@ cloudflare_auth_key=####
    #
    #
    # echo "# Downloading Nginx..."
-   # lxc exec ${lxcname}  -- sh -c "apt -y install nginx -qsq" --verbose; lxc exec ${lxcname}  -- sh -c "rm /var/www/html/index.nginx-debian.html" --verbose; lxc exec ${lxcname}  -- sh -c "echo \"<h1> This is LXC ${lxcname}\" >> /var/www/html/index.nginx-debian.html" --verbose
+   # lxc exec ${lxcname}  -- sh -c "apt -y install nginx -qq" --verbose; lxc exec ${lxcname}  -- sh -c "rm /var/www/html/index.nginx-debian.html" --verbose; lxc exec ${lxcname}  -- sh -c "echo \"<h1> This is LXC ${lxcname}\" >> /var/www/html/index.nginx-debian.html" --verbose
    #
    #
    # Remove this later if its working then enable Ansible
@@ -810,11 +814,11 @@ cloudflare_auth_key=####
    lxc exec ${lxcname} -- sh -c "systemctl restart sshd" --verbose
 
 
-   echo "#"
+   echo "# Nicely done! Please see your WordPress login details below. Have fun!"
    echo "#"
    echo "#"
    echo "# Visit your WordPress site using this link: http://$cfdomain.causingdesigns.net"
-   echo "# Phpmyadmin - http://$cfdomain.causingdesigns.net/phpmyadmin - user: wp_user - pass: password"
+   echo "# Phpmyadmin - http://$cfdomain.causingdesigns.net/phpmyadmin - username: ${lxcname} -- Password: the one you entered earlier"
    echo "# WordPress login url: http://$cfdomain.causingdesigns.net/wp-admin "
    echo "# WordPerss username: ${lxcname} -- Password: the one you entered earlier" 
    echo "# SSH access: ssh ${lxcname}@$cfdomain.causingdesigns.net -p $sshport"
