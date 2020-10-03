@@ -5,7 +5,10 @@ server {
     # server_name nginx1.example.com;
 
     location / {
-            # This is to fix the mixed-content issue
+    
+           client_max_body_size 100M; 
+        
+        # This is to fix the mixed-content issue
             proxy_set_header X-Forwarded-Proto $scheme;
                         
             proxy_set_header Host $host; 
