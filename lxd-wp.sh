@@ -224,7 +224,7 @@ cloudflare_auth_key=####
    echo -n "# Enter your WordPress Password": 
    read -s wppassword
 
-   echo "# Hello! Enter the LXC container name please:"
+   echo "#"
    read -p "# Enter your WordPress email: " wpemail
    echo "#"
    echo "#"
