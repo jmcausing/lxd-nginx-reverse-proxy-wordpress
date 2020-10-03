@@ -335,13 +335,13 @@ cloudflare_auth_key=####
          echo "# LXD is version $(sudo lxd version). We will proceed adding LXD Proxy device"
 
       else
-         echo "# Please run LXD version 4.x or later. This is not run! See linkx below for upgrade"
-         echo "# https://www.linode.com/docs/applications/containers/beginners-guide-to-lxd/"
-         echo "# then"
-         echo "# https://www.linode.com/docs/applications/containers/beginners-guide-to-lxd/"
-         echo "# then sudo lxd.migrate"
+         echo "# Installing LXD from Snap to get version 4.x.."
          echo "# "
-         exit 1
+         sudo snap install lxd
+         sudo lxd.migrate -yes
+         wget -q https://raw.githubusercontent.com/jmcausing/lxd-nginx-reverse-proxy-wordpress/master/lxdconfig.yaml
+         sudo lxd init --preseed < lxdconfig.yaml
+         rm lxdconfig.yaml   
       fi
    
       echo "# Reverse Proxy container is not here. Installing Reverse Proxy container"
