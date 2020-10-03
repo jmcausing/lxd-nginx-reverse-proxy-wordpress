@@ -4,8 +4,8 @@ echo "#"
 # Cloudflare add DNS for this LXC Cloudflare zone is the zone which holds the record
 zone=causingdesigns.net
 ## Cloudflare authentication details keep these private
-cloudflare_auth_email=#####
-cloudflare_auth_key=####
+cloudflare_auth_email=###
+cloudflare_auth_key=######
 
 
    #################### 
@@ -390,6 +390,9 @@ cloudflare_auth_key=####
       echo "# Install nginx to Reverse Proxy container..."
       lxc exec rproxy -- sh -c "apt -y install nginx -qq" --verbose
 
+      echo "# Adding client_max_body_size 100M; to this nginx reverse proxy"
+      lxc exec rproxy -- sh -c "sed -i  '/^http {/a\        client_max_body_size 100M;'  /etc/nginx/nginx.conf"
+
 
       # Install Let's Encrypt certbot to rprox continer
       echo "# "
@@ -730,7 +733,7 @@ cloudflare_auth_key=####
   
    echo "# "
    echo "# Apply Let's Encrypt SSL for this domain (certbot automated)"
-   lxc exec rproxy -- sh -c "certbot --nginx --non-interactive --agree-tos --domains ${cfdomain}.causingdesigns.net --email johnmarkcausing@gmail.com" --verbose 
+   lxc exec rproxy -- sh -c "certbot --nginx --non-interactive --agree-tos --redirect --domains ${cfdomain}.causingdesigns.net --email johnmarkcausing@gmail.com" --verbose 
 
 
    echo "# "
@@ -802,6 +805,8 @@ cloudflare_auth_key=####
    echo "# Adding SSH user and password update.."
    echo "#"
    lxc exec ${lxcname} -- sh -c "useradd -m -g www-data -p 1234 ${lxcname}" --verbose
+
+   echo "# Running: lxc exec ${lxcname} -- sh -c \"echo ${lxcname}:$wppassword-$sshpass | chpasswd\""
    lxc exec ${lxcname} -- sh -c "echo ${lxcname}:$wppassword-$sshpass | chpasswd"
 
    echo "# Configure SSH allow password authentication.."
@@ -816,14 +821,17 @@ cloudflare_auth_key=####
 
    echo "# Nicely done! Please see your WordPress login details below. Have fun!"
    echo "#"
+   echo "##############################################################################"
    echo "#"
-   echo "# Visit your WordPress site using this link: http://$cfdomain.causingdesigns.net"
-   echo "# Phpmyadmin - http://$cfdomain.causingdesigns.net/phpmyadmin - username: ${lxcname} -- Password: the one you entered earlier"
+   echo "# Visit your WordPress site using this link: https://$cfdomain.causingdesigns.net"
+   echo "# Phpmyadmin - https://$cfdomain.causingdesigns.net/phpmyadmin - username: ${lxcname} -- Password: the one you entered earlier"
    echo "# WordPress login url: http://$cfdomain.causingdesigns.net/wp-admin "
    echo "# WordPerss username: ${lxcname} -- Password: the one you entered earlier" 
    echo "# SSH access: ssh ${lxcname}@$cfdomain.causingdesigns.net -p $sshport"
    echo "# SSH password is your WP password + -$sshpass. Example: Mypassword1234-$sshpass"
    echo "# Note: Make sure you also allow ports like this in GPC firewall tcp:2000-2999"
+   echo "#"
+   echo "##############################################################################"
    echo "#"
    echo "#"
    echo "# Thank you for using LXC LEMP + WordPress setup!"
