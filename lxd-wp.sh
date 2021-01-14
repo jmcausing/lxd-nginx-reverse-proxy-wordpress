@@ -782,8 +782,8 @@ cloudflare_auth_key=######
    lxc exec ${lxcname} -- sh -c "ln -s /usr/share/phpmyadmin /var/www/html" --verbose 
 
    echo "#"
-   echo "# systemctl restart php7.3-fpm"
-   lxc exec ${lxcname} -- sh -c "systemctl restart php7.3-fpm" --verbose 
+   echo "# systemctl restart php7.4-fpm"
+   lxc exec ${lxcname} -- sh -c "systemctl restart php7.4-fpm" --verbose 
 
    # Setup add user and enable SSH password authentication
    echo "# Let's setup SSH access.."   
