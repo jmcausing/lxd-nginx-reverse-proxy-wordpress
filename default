@@ -18,6 +18,10 @@
 
 # Default server configuration
 #
+
+# Fastcgi cache module
+fastcgi_cache_path /etc/nginx/cache levels=1:2 keys_zone=jmc_lxd_cache:100m inactive=60m;
+fastcgi_cache_key "$scheme$request_method$host$request_uri";
 server {
 
 	client_max_body_size 100M;
@@ -69,7 +73,14 @@ server {
         #
         location ~ \.php$ {
                 include snippets/fastcgi-php.conf;
-                fastcgi_pass unix:/run/php/php7.4-fpm.sock;      
+                fastcgi_pass unix:/run/php/php7.4-fpm.sock;     
+		
+		# Fastcgi cache
+		include fastcgi_params;
+		fastcgi_cache jmc_lxd_cache;
+		fastcgi_cache_valid 200 60m;
+		add_header jmx-lxd-X-Cache $upstream_cache_status;		
+		
         }
 
         # deny access to .htaccess files, if Apache's document root
